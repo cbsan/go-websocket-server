@@ -1,6 +1,6 @@
 FROM alpine
 
-WORKDIR /cbio
+WORKDIR /go
 
 COPY ./bin/server .
 

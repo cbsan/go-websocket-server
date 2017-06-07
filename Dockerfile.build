@@ -1,0 +1,4 @@
+FROM alpine
+
+RUN apk update -U \
+    && apk add git
