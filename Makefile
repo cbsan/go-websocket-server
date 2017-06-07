@@ -1,4 +1,4 @@
-DOCKER_IMAGE=cbio/websocket
+DOCKER_IMAGE=jaschweder/websocket
 
 all: go docker
 
