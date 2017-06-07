@@ -1,4 +1,5 @@
 DOCKER_IMAGE=jaschweder/websocket
+DOCKER_RUN=docker run -it --rm -v ${CURDIR}:/go golang:alpine
 
 all: go docker
 
@@ -10,4 +11,5 @@ clean:
 	rm -f ./bin/server
 
 go:
-	docker run -it --rm -v ${CURDIR}:/go golang:alpine go build -o ./bin/server *.go
+	${DOCKER_RUN} go get -t -d
+	${DOCKER_RUN} go build -o ./bin/server *.go
