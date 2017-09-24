@@ -14,13 +14,13 @@ const (
 	writeWait = 10 * time.Second
 
 	// Time allowed to read the next pong message from the peer.
-	pongWait = 60 * time.Second
+	pongWait = 60 * 5 * time.Second
 
 	// Send pings to peer with this period. Must be less than pongWait.
 	pingPeriod = (pongWait * 9) / 10
 
 	// Maximum message size allowed from peer.
-	maxMessageSize = 143360
+	maxMessageSize = 999999
 )
 
 var (
@@ -45,6 +45,9 @@ type Client struct {
 
     // Channel that the Client is connected
     Channel string
+
+    // Unique Id for the client
+    Id int64
 }
 
 type ClientMessage struct {
@@ -148,7 +151,7 @@ func serveWs(hub *Hub, w http.ResponseWriter, r *http.Request, c string) {
 		return
 	}
 
-    client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Channel: c}
+    client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256), Channel: c, Id: time.Now().UTC().UnixNano()}
 	client.hub.register <- client
 	go client.writePump()
 	client.readPump()
