@@ -8,6 +8,7 @@ import (
     "strings"
     "strconv"
     "fmt"
+    "log"
 )
 
 // hub maintains the set of active clients and broadcasts messages to the
@@ -45,7 +46,7 @@ func (h *Hub) run() {
 
             if err == nil {
                 var lastMessage string = string(content[:])
-                result := strings.Split(lastMessage, ",")
+                result := strings.Split(lastMessage, "|")
                 timeLastMessage, err := time.Parse(time.UnixDate, result[0])
 
                 if err == nil {
@@ -53,7 +54,7 @@ func (h *Hub) run() {
                     if err == nil {
                         if  originalMessageClientId != client.Id {
                             // if last message was send 30 seconds later, send again
-                            if (time.Now().Sub(timeLastMessage).Seconds() < 30) {
+                            if (time.Now().Sub(timeLastMessage).Seconds() < 60) {
                                 select {
                                 case client.send <- []byte(result[2]):
                                 default:
@@ -75,6 +76,7 @@ func (h *Hub) run() {
 			for client := range h.clients {
                 if client.Channel == message.Channel {
                     if client.Id != message.From.Id {
+                        log.Println("Sending message to client" + fmt.Sprint(client.Id))
                         select {
                         case client.send <- message.Body:
                         default:
@@ -82,9 +84,9 @@ func (h *Hub) run() {
                             delete(h.clients, client)
                         }
 
-                        var filename string = filepath.Join(os.TempDir(), message.Channel + ".msg")
-                        ioutil.WriteFile(filename, []byte(time.Now().Format(time.UnixDate) + "," + fmt.Sprint(client.Id) + "," + string(message.Body)), 0755)
                     }
+                    var filename string = filepath.Join(os.TempDir(), message.Channel + ".msg")
+                    ioutil.WriteFile(filename, []byte(time.Now().Format(time.UnixDate) + "|" + fmt.Sprint(client.Id) + "|" + string(message.Body)), 0755)
                 }
 			}
 		}
